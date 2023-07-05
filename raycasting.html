@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <style>
+        body {
+            background: white;
+            display: flex;
+        }
+
+        #canvas {
+            display: block;
+            border: 2px solid black;
+
+            margin-right: auto;
+        }
+
+        #menu {
+            margin-right: 10%;
+        }
+        </style>
+
+        <title>Ray Casting</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body> 
+        <div id="menu">
+            <p id='fps'>FPS: 0</p> 
+
+            <input type="checkbox" id="movement-type">
+            <label for="movement-type">Cursor-led movement</label>
+        </div>
+        <canvas id="canvas" width="800" height="600"></canvas>
+    </body>
+    <script src="js/raycasting.js"></script>
+</html>
