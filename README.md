@@ -1,4 +1,4 @@
 # silly-game
 i'm dumb as fuck
 
-the thing is at [here](whirlwindnoa.com/3d)
+the thing is at [here](https://whirlwindnoa.com/3d)
