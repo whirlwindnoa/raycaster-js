@@ -1,2 +1,4 @@
 # silly-game
-some raycasting shit i'm trying to do
+i'm dumb as fuck
+
+the thing is at [here](whirlwindnoa.com/3d)
