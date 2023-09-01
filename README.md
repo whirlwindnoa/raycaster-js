@@ -1,4 +1,3 @@
 # silly-game
-i'm dumb as fuck
-
+raycasting thing
 the thing is at [here](https://whirlwindnoa.com/3d) (might be outdated there)
