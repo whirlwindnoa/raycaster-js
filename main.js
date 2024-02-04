@@ -36,7 +36,8 @@ const map2 = [
 // game globals
 let          FPS = 0;
 let       frames = 0;
-let      maxRays = 2;
+let      maxRays = 200;
+let      renderingDistance = 10;
 
 let  gameRunning = true;
 let movementType = false;
@@ -44,20 +45,23 @@ let movementType = false;
 // object globals
 var        world;
 var       player;
+var      player2;
 var       canvas;
 var          ctx;
 
-var startingTime;
+var   lastCalled;
 
 // initialization function, runs when the window loads
 const init = () => {
     canvas = document.getElementById('canvas');
     ctx = canvas.getContext('2d');
 
-    player = new Player(400, 300, 0, 2, 25);
+    precomputeTrig(360);
+
+    player = new Player(400, 300, 0, 2, 10);
     world = new World(16, 12, map1);
 
-    startingTime = performance.now();
+    lastCalled = performance.now();
 
     window.requestAnimationFrame(mainLoop);
 }
@@ -66,17 +70,15 @@ window.onload = init;
 
 const mainLoop = (timestamp) => {
     clearCanvas();
-    
-    FPS = frames / ((performance.now()-startingTime)/1000);
-    document.getElementById('fps').innerHTML = "FPS: " + Math.round(FPS);
-    
-    world.draw();
+
+    document.getElementById('fps').innerHTML = "FPS: " + FPS;
 
     player.update();
-    player.draw();
+
     player.rayCaster();
 
-
+    //player.draw();
+    //world.draw();
     frames++;
     if (gameRunning) window.requestAnimationFrame(mainLoop);
 }

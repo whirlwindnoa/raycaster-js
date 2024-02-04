@@ -2,7 +2,7 @@
 class Player {
     constructor(x = 400, y = 300, angle = 0, speed = 2, size = 25) {
         // left bottom cords, center coords
-        this.pos = new Array(x, y);
+        this.pos = new Vertex2D(x, y);
         this.corners = new Array(
             [x - size/2, y - size/2],
             [x + size/2, y + size/2],
@@ -18,44 +18,43 @@ class Player {
         this.cosA = 1;
 
         this.range = 200;
-        this.FOV = 90;
+        this.FOV = 45;
     }
 
+    // update players position according to the pressed keys
     update() {
         this.sinA = sind(this.angle);
         this.cosA = cosd(this.angle);
 
-        //this. = this.pos[0] + this.size/2;
-        //this. = this.pos[1] + this.size/2;
+        //this. = this.pos.x + this.size/2;
+        //this. = this.pos.y + this.size/2;
         
-        this.corners[0][0] = this.pos[0] - this.size/2;
-        this.corners[0][1] = this.pos[1] - this.size/2;
+        this.corners[0][0] = this.pos.x - this.size/2;
+        this.corners[0][1] = this.pos.y - this.size/2;
 
-        this.corners[1][0] = this.pos[0] + this.size/2;
-        this.corners[1][1] = this.pos[1] + this.size/2;
+        this.corners[1][0] = this.pos.x + this.size/2;
+        this.corners[1][1] = this.pos.y + this.size/2;
 
         if (keys[0]) { // W
-            this.pos[0] += this.speed * this.cosA;
-            this.pos[1] += this.speed * this.sinA;
+            this.pos.x += this.speed * this.cosA;
+            this.pos.y += this.speed * this.sinA;
         }
         if (keys[2]) { // S
-            this.pos[0] += -this.speed * this.cosA;
-            this.pos[1] += -this.speed * this.sinA;
+            this.pos.x += -this.speed * this.cosA;
+            this.pos.y += -this.speed * this.sinA;
         }
         if (keys[1]) { // A
-            this.pos[0] += this.speed * this.sinA;
-            this.pos[1] += -this.speed * this.cosA;
+            this.pos.x += this.speed * this.sinA;
+            this.pos.y += -this.speed * this.cosA;
         }
         if (keys[3]) { // D
-            this.pos[0] += -this.speed * this.sinA;
-            this.pos[1] += this.speed * this.cosA;
+            this.pos.x += -this.speed * this.sinA;
+            this.pos.y += this.speed * this.cosA;
         }
-        
-        // control type 1, uses cursor on 2d space to manipulate angle
         
         if (movementType) 
             // control type 1, uses cursor on 2d space to manipulate angle
-            this.angle = Math.atan2(mouseY - this.pos[1], mouseX - this.pos[0]) * 180/Math.PI;
+            this.angle = Math.atan2(mouseY - this.pos.y, mouseX - this.pos.x) * 180/Math.PI;
         else { 
             // control type 2, uses arrows instead of the cursor
             if (keys[4]) // Left Arrow
@@ -64,78 +63,115 @@ class Player {
                 this.angle += 2;
         }
 
-        if (this.angle > 360) this.angle = 0;
-        else if (this.angle < 0) this.angle = 360;
+        if (this.angle >= 360) this.angle = 0;
+        else if (this.angle < 0) this.angle = 359;
     }
 
+    // draws the player
     draw() {
-        drawRect(this.corners[0][0], this.corners[0][1], this.size, this.size, "red");
+        drawRect(new Vertex2D(this.corners[0][0], this.corners[0][1]), new Vertex2D(this.size, this.size), "red");
 
-        drawLine(this.pos[0],  this.pos[1],
-                 this.pos[0] + this.cosA * this.range * 1.25, 
-                 this.pos[1] + this.sinA * this.range * 1.25,
-                 "green");
+        // drawLine(this.pos,
+        //          new Vertex2D(this.pos.x + this.cosA * this.range * 1.25, 
+        //          this.pos.y + this.sinA * this.range * 1.25),
+        //          "blue");
     }
 
+    // (probably) faster raycasting algorithm for tiled worlds
     rayCaster() {
         let startAngle = this.angle - this.FOV / 2;
         let rayAngle = this.FOV / maxRays;
-      
+
+        drawRect(new Vertex2D(0, 300), new Vertex2D(800, 300), "rgb(255 255 255)");
         for (let i = 0; i < maxRays; i++) {
-            let curAngle = startAngle + (i + 0.5) * rayAngle;
+            let curAngle = normalizeAngle(startAngle + (i + 0.5) * rayAngle);
 
             let sinC = sind(curAngle);
             let cosC = cosd(curAngle);
             let tanC = tand(curAngle);
+
+            let horizIntersect = new Vertex2D();
+            let vertIntersect = new Vertex2D();
+
+            let horizDist = new Vertex2D(world.tileX / tanC, world.tileX);
+            let vertDist = new Vertex2D(world.tileY, world.tileY * tanC);
             
-            let Py = this.pos[1];
-            let Px = this.pos[0];
-
-            let Ay;
-            let Ax;
-
-            let xd = world.tileX / tanC;
-            let yd;
-
+            // HORIZONTAL INTERSECTIONS
             // facing downwards
-            if (this.angle > 0 && this.angle <= 180) {
-                Ay = Math.floor(Py/world.tileY) * (world.tileY) + world.tileY;
-                yd = world.tileY;
+            if (curAngle > 0 && curAngle <= 180) {
+                horizIntersect.y = Math.floor(this.pos.y/world.tileY) * (world.tileY) + world.tileY;
+                horizDist.y = world.tileY;
+
+                horizDist.x = world.tileX / tanC
             }
             // facing upwards
-            else {
-                Ay = Math.floor(Py/world.tileY) * (world.tileY) - 1;
-                yd = -world.tileY;
+            else if (curAngle > 180 && curAngle <= 360) {
+                horizIntersect.y = Math.floor(this.pos.y/world.tileY) * (world.tileY) - 1;
+                horizDist.y = -world.tileY;
+
+                horizDist.x = -1 * (world.tileX / tanC);
             }
             
-            Ax = Math.floor(this.pos[0] + (Ay - this.pos[1])/tanC);
+            // VERTICAL INTERSECTIONS
+            // facing left
+            if (curAngle >= 90 && curAngle < 270) {
+                vertIntersect.x = Math.floor(this.pos.x/world.tileX) * (world.tileX) - 1;
+                vertDist.x = -world.tileX;
+                vertDist.y = -vertDist.y;
+            }
+            // facing right
+            else {
+                vertIntersect.x = Math.floor(this.pos.x/world.tileX) * (world.tileX) + world.tileX;
+                vertDist.x = world.tileX;
+            }
             
-            drawRect(Ax, Ay, 10, 10, "green");
+            horizIntersect.x = this.pos.x + ((horizIntersect.y - this.pos.y)/tanC);
+            vertIntersect.y = this.pos.y - ((this.pos.x - vertIntersect.x)*tanC);
+            
             let counter = 0;
-            while (!world.check(Ax, Ay, "#")[2]) {
-                if (counter > 10) break;
 
-                if (this.angle > 0 && this.angle <= 180) {
-                    Ax += xd;
-                }
-                else {
-                    Ax -= xd;
-                }
-                Ay += yd;
+            while (!world.check(horizIntersect.x, horizIntersect.y, "#")[2]) {
+                if (counter > renderingDistance) break;
+                
+                horizIntersect.x += horizDist.x;
+                horizIntersect.y += horizDist.y;
 
-                drawRect(Ax, Ay, 10, 10, "green");
                 counter++;
             }
 
-            let xt = Ax / world.tileX;
-            let yt = Ay / world.tileY;
-            
-            let rayPos = [
-                this.pos[0] + cosd(curAngle) * this.range,
-                this.pos[1] + sind(curAngle) * this.range
-            ];
-        
-            //drawLine(this.pos[0], this.pos[1], rayPos[0], rayPos[1], "gray");
+            counter = 0;
+
+            while (!world.check(vertIntersect.x, vertIntersect.y, "#")[2]) {
+                if (counter > renderingDistance) break;
+                
+                vertIntersect.x += vertDist.x;
+                vertIntersect.y += vertDist.y;
+
+                counter++;
+            }
+
+            let cosbeta = cosd((this.FOV / maxRays) * i - 30);
+            let disthIntersect = findDistanceSqrt(this.pos, horizIntersect);
+            let distvIntersect = findDistanceSqrt(this.pos, vertIntersect);
+
+            let dist;
+            if (disthIntersect < distvIntersect) {
+                //drawLine(this.pos, horizIntersect, "green", 2);
+                dist = disthIntersect;
+            }
+            else {
+                //drawLine(this.pos, vertIntersect, "green", 2);
+                dist = distvIntersect;
+            }
+
+            let projHeight = world.tileX / dist * (400/tand(this.FOV/2));
+            let scale = 800 / maxRays;
+
+            var projectiond = new Vertex2D(scale, world.tileX / dist * 692);
+            var projectionp = new Vertex2D(i * scale, 300 - projectiond.y/2);
+
+            let opacity = dist / 500;
+            drawRect(projectionp, projectiond, `rgb(0 0 0 / ${opacity * 100}%)`);
         }
     }
 }
@@ -169,10 +205,12 @@ class World {
         for (let i = 0; i < this.height; i++) {
             for (let j = 0; j < this.width; j++) {
                 if (this.map[i][j] == '#') {
-                    drawRect(j * this.tileX, i * this.tileY, this.tileX, this.tileY, "black", true);
+                    drawRect(new Vertex2D(j * this.tileX, i * this.tileY), 
+                             new Vertex2D(this.tileX, this.tileY, "black", true));
                 }
                 else if (this.map[i][j] == ".") {
-                    drawRect(j * this.tileX, i * this.tileY, this.tileX, this.tileY, "lightgray", false);
+                    drawRect(new Vertex2D(j * this.tileX, i * this.tileY), 
+                             new Vertex2D(this.tileX, this.tileY), "lightgray", false);
                 }
             }
         }

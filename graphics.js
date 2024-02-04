@@ -1,32 +1,32 @@
-const drawLine = (x1, y1, x2, y2, color = "black", width = 1) => {
+const drawLine = (a, b, color = "black", width = 1) => {
     ctx.lineWidth = width;
     ctx.strokeStyle = color;
 
     ctx.beginPath();
 
-    ctx.moveTo(x1, y1);
-    ctx.lineTo(x2, y2);
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
 
     ctx.stroke();
 }
 
-const drawRect = (x, y, w, h, color = "black", doFill = true, lineWidth = 1) => {
+const drawRect = (a, dimension, color = "black", doFill = true, lineWidth = 1) => {
     ctx.fillStyle = color;
     ctx.strokeStyle = color;
     if (doFill) {
-        ctx.fillRect(x, y, w, h);
+        ctx.fillRect(a.x, a.y, dimension.x, dimension.y);
     }
     else {
         ctx.lineWidth = lineWidth;
-        ctx.strokeRect(x, y, w, h);
+        ctx.strokeRect(a.x, a.y, dimension.x, dimension.y);
     }
 }
 
-const drawCircle = (x, y, r, color = "black", doFill = true) => {
+const drawCircle = (a, r, color = "black", doFill = true) => {
     ctx.fillStyle = color;
     ctx.strokeStyle = color;
 
-    ctx.arc(x, y, r, 0, 2*Math.PI);
+    ctx.arc(a.x, a.y, r, 0, 2*Math.PI);
 
     if (doFill) {
         ctx.fill();
