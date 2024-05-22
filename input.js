@@ -52,6 +52,6 @@ window.addEventListener('mousemove', (event) => {
 });
 
 // change movement type whenever state of the checkbox changes
-document.getElementById('movement-type').addEventListener('change', (event) => {
-    movementType = !movementType;
-});
+// document.getElementById('movement-type').addEventListener('change', (event) => {
+//     movementType = !movementType;
+// });

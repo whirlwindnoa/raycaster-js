@@ -36,8 +36,8 @@ const map2 = [
 // game globals
 let          FPS = 0;
 let       frames = 0;
-let      maxRays = 200;
-let      renderingDistance = 10;
+let      maxRays = 160;
+let      renderingDistance = 11;
 
 let  gameRunning = true;
 let movementType = false;
@@ -56,9 +56,10 @@ const init = () => {
     canvas = document.getElementById('canvas');
     ctx = canvas.getContext('2d');
 
+    ctx.globalCompositeOperation = 'source-over'; 
     precomputeTrig(360);
 
-    player = new Player(400, 300, 0, 2, 10);
+    player = new Player(canvas.width/2, canvas.height/2, 0, 2, 10);
     world = new World(16, 12, map1);
 
     lastCalled = performance.now();
@@ -71,10 +72,7 @@ window.onload = init;
 const mainLoop = (timestamp) => {
     clearCanvas();
 
-    document.getElementById('fps').innerHTML = "FPS: " + FPS;
-
     player.update();
-
     player.rayCaster();
 
     //player.draw();

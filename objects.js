@@ -82,7 +82,6 @@ class Player {
         let startAngle = this.angle - this.FOV / 2;
         let rayAngle = this.FOV / maxRays;
 
-        drawRect(new Vertex2D(0, 300), new Vertex2D(800, 300), "rgb(255 255 255)");
         for (let i = 0; i < maxRays; i++) {
             let curAngle = normalizeAngle(startAngle + (i + 0.5) * rayAngle);
 
@@ -150,7 +149,7 @@ class Player {
                 counter++;
             }
 
-            let cosbeta = cosd((this.FOV / maxRays) * i - 30);
+            //let cosbeta = cosd((this.FOV / maxRays) * i - 30);
             let disthIntersect = findDistanceSqrt(this.pos, horizIntersect);
             let distvIntersect = findDistanceSqrt(this.pos, vertIntersect);
 
@@ -164,14 +163,14 @@ class Player {
                 dist = distvIntersect;
             }
 
-            let projHeight = world.tileX / dist * (400/tand(this.FOV/2));
-            let scale = 800 / maxRays;
+            let projHeight = world.tileX / dist * (canvas.width/tand(this.FOV/2));
+            let scale = Math.floor(canvas.width / maxRays);
 
-            var projectiond = new Vertex2D(scale, world.tileX / dist * 692);
-            var projectionp = new Vertex2D(i * scale, 300 - projectiond.y/2);
+            var projectiond = new Vertex2D(scale, world.tileX / dist * canvas.width);
+            var projectionp = new Vertex2D(i * scale, (canvas.height/2) - projectiond.y/2);
 
-            let opacity = dist / 500;
-            drawRect(projectionp, projectiond, `rgb(0 0 0 / ${opacity * 100}%)`);
+            let r = (1 - dist / 500) * 255;
+            drawRect(projectionp, projectiond, `rgba(${r}, ${r}, ${r})`);
         }
     }
 }

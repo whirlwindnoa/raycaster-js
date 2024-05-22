@@ -37,6 +37,9 @@ const drawCircle = (a, r, color = "black", doFill = true) => {
 }
 
 const clearCanvas = () => {
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = 'rgba(0, 45, 60, 1)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height / 2);
+
+    ctx.fillStyle = 'rgba(0, 0, 0, 1.0)';
+    ctx.fillRect(0, canvas.height / 2, canvas.width, canvas.height / 2);
 }
